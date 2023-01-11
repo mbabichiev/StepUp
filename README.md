@@ -1,6 +1,6 @@
 # StepUp
 
-**Rest application for creating, searching and managing events, using `express, JWT, nodemailer, MongoDB`**.
+**REST application for creating, searching and managing events, using `express, JWT, nodemailer, MongoDB`**.
 
 #
 # Quick start
