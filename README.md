@@ -22,4 +22,4 @@ npm i
 node server.js
 ```
 
-**`Endpoints` are described in [documentation.md](#documentation.md)**;
+**`Endpoints` are described in [documentation.md](https://github.com/mbabichiev/StepUp/blob/main/documentation.md)**;
