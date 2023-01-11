@@ -12,7 +12,6 @@
 #
 
 <a name="authorization"><h2>Authorization</h2></a>
-#
 - **register**
 - **login**
 - **logout**
@@ -195,7 +194,6 @@ response:
 #
 
 <a name="users"><h2>Users</h2></a>
-#
 - **get user by login**
 - **get user photo by login**
 - **get own user events by login**
@@ -432,7 +430,6 @@ response: status 204
 #
 
 <a name="events"><h2>Events</h2></a>
-#
 - **create own event**
 - **subscribe on event**
 - **unsubscribe from event**
@@ -804,7 +801,6 @@ response: status 204
 #
 
 <a name="categories"><h2>Categories</h2></a>
-#
 - **create category**
 - **update category data**
 - **get category by id**
@@ -906,7 +902,6 @@ response: status 204
 #
 
 <a name="wallets"><h2>Wallets</h2></a>
-#
 - **add money to wallet**
 - **withdraw money from wallet**
 - **get amount of money of own wallet**
@@ -977,7 +972,6 @@ response:
 
 #
 <a name="likes"><h2>Likes</h2></a>
-#
 - **create like under event**
 - **get like under event**
 - **delete like under event**
@@ -1033,7 +1027,6 @@ response: status 204
 
 #
 <a name="comments"><h2>Comments</h2></a>
-#
 - **create comment under event**
 - **update comment by id**
 - **get all comments by event id**
