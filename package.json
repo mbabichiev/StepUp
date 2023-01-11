@@ -1,0 +1,39 @@
+{
+  "name": "stepup",
+  "version": "1.0.0",
+  "description": "Rest application for creating, searching and managing events, using express, JWT, nodemailer, MongoDB",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mbabichiev/StepUp.git"
+  },
+  "keywords": [],
+  "author": "mbabichiev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mbabichiev/StepUp/issues"
+  },
+  "homepage": "https://github.com/mbabichiev/StepUp#readme",
+  "dependencies": {
+    "axios": "^1.2.2",
+    "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-fileupload": "^1.4.0",
+    "express-validator": "^6.14.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.11.0",
+    "mongoose": "^6.7.1",
+    "nodemailer": "^6.8.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
