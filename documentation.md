@@ -1,17 +1,17 @@
 # Endpoints
 
-- ## [Authorization](#authorization)
-- ## [Users](#users)
-- ## [Events](#events)
-- ## [Categories](#categories)
-- ## [Wallets](#wallets)
-- ## [Likes](#likes)
-- ## [Comments](#comments)
+- [Authorization](#authorization)
+- [Users](#users)
+- [Events](#events)
+- [Categories](#categories)
+- [Wallets](#wallets)
+- [Likes](#likes)
+- [Comments](#comments)
 
 
 #
 
-## <a name="authorization"><h3>*Authorization*</h3></a>
+<a name="authorization"><h2>Authorization</h2></a>
 #
 - **register**
 - **login**
@@ -194,7 +194,7 @@ response:
 
 #
 
-## <a name="users"><h3>*Users*</h3></a>
+<a name="users"><h2>Users</h2></a>
 #
 - **get user by login**
 - **get user photo by login**
@@ -431,7 +431,7 @@ response: status 204
 
 #
 
-## <a name="events"><h3>*Events*</h3></a>
+<a name="events"><h2>Events</h2></a>
 #
 - **create own event**
 - **subscribe on event**
@@ -803,7 +803,7 @@ response: status 204
   
 #
 
-## <a name="categories"><h3>*Categories*</h3></a>
+<a name="categories"><h2>Categories</h2></a>
 #
 - **create category**
 - **update category data**
@@ -905,7 +905,7 @@ response: status 204
 
 #
 
-## <a name="wallets"><h3>*Wallets*</h3></a>
+<a name="wallets"><h2>Wallets</h2></a>
 #
 - **add money to wallet**
 - **withdraw money from wallet**
@@ -976,7 +976,7 @@ response:
 - `User is not authorized`
 
 #
-## <a name="likes"><h3>*Likes*</h3></a>
+<a name="likes"><h2>Likes</h2></a>
 #
 - **create like under event**
 - **get like under event**
@@ -1032,7 +1032,7 @@ response: status 204
 - `Like not found`
 
 #
-## <a name="comments"><h3>*Comments*</h3></a>
+<a name="comments"><h2>Comments</h2></a>
 #
 - **create comment under event**
 - **update comment by id**
