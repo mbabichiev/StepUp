@@ -1,5 +1,6 @@
 const GeocodingAPI = require('../api/GeocodingAPI');
 const EventDto = require('../dtos/EventDto');
+const UserLinkDto = require('../dtos/UserLinkDto');
 const ErrorHandler = require('../exeptions/ErrorHandler');
 const CategoryModel = require('../models/Category');
 const EventModel = require('../models/Event');
@@ -191,7 +192,7 @@ class EventService {
 
         const coordinates = await GeocodingAPI.getCoordinatesByIp(ip);
 
-        if(!coordinates) {
+        if (!coordinates) {
             throw ErrorHandler.BadRequest("Ip address not correct");
         }
 
@@ -220,6 +221,44 @@ class EventService {
 
         const condition = { '_id': { $in: user.available_events } };
         return await this.#getByConditionLimitSortTypePage(condition, limit, sort, type, page);
+    }
+
+
+    async getSubscribersOfEventByEventId(id, limit, page) {
+        console.log("Get page of subscribers of event with id: " + id + " and with limit: " + limit + " and page: " + page);
+
+        if (limit && limit < 0) {
+            throw ErrorHandler.BadRequest("Limit should be more than 0");
+        }
+
+        if (page && page < 0) {
+            throw ErrorHandler.BadRequest('Page should be more than 0');
+        }
+
+        if (!limit) {
+            limit = 30;
+        }
+
+        if (!page) {
+            page = 0;
+        }
+
+        const event = await EventModel.findById(id);
+        if (!event) {
+            throw ErrorHandler.BadRequest(`Event with id ${id} not found`);
+        }
+
+        page++;
+        const subscribers = await UserModel.find({ '_id': { $in: event.subscribers } })
+            .limit(limit)
+            .skip(page > 0 ? ((page - 1) * limit) : 0);
+        const subscribersDto = [];
+
+        for (var i = 0; subscribers[i]; i++) {
+            subscribersDto.push(new UserLinkDto(subscribers[i]));
+        }
+
+        return subscribersDto;
     }
 
 

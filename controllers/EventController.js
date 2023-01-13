@@ -54,6 +54,21 @@ class AuthController {
     }
 
 
+    async getSubscribersOfEvent(request, response, next) {
+        try {
+
+            const event_id = request.params.id;
+            const {limit, page} = request.query;
+
+            const subscribers = await eventService.getSubscribersOfEventByEventId(event_id, limit, page);
+            return response.status(200).json(subscribers);
+        }
+        catch(e) {
+            next(e);
+        }
+    }
+
+
     async getUserEventsByQueryParams(request, response, next) {
         try {
 

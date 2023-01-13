@@ -48,6 +48,7 @@ eventRouter.get('/:id', eventController.getEvent);
 eventRouter.get('/:id/photo', eventController.getEventPhoto);
 eventRouter.get('/', eventController.getAllEventsByQueryParams);
 eventRouter.get('/ip/:ip', eventController.getNearEventsByQueryParams);
+eventRouter.get('/:id/subscribers', eventController.getSubscribersOfEvent);
 
 eventRouter.delete('/:id', authMidleware, eventMiddleware, eventController.deleteEvent);
 eventRouter.delete('/:id/photo', authMidleware, eventMiddleware, eventController.deleteEventPhoto);

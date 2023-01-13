@@ -444,6 +444,7 @@ response: status 204
 - **get event photo by event id**
 - **get nearest events by ip**
 - **get events by query params** *(city, country, sort etc.)*
+- **get subscribers of event by event id and query params**
 - **delete event by id**
 - **delete event photo by event id**
 #
@@ -768,6 +769,34 @@ response:
 - `Page should be more than 0`
 - `Sort should be 'earliest', 'latest' or 'popular'`
 - `Type should be 'active' or 'inactive'`
+
+#
+
+`GET - /api/events/:event_id/subscribers` - get subscribers of event id
+
+If event don't have subscribers, you get empty array - `[]`.
+
+`Query params`:
+- `limit` (default `30`);
+- `page` (default `0`);
+
+```JavaScript
+response: 
+[
+    {
+        "login": "login",
+        "firstname": "Firstname",
+        "lastname": "Lastname",
+        "official": false / true
+    },
+    ...
+]
+```
+
+`Errors:`
+- `Limit should be more than 0` 
+- `Page should be more than 0`
+- `Event with id {id} not found`
 
 #
 
