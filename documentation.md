@@ -81,6 +81,7 @@ response:
         "email": "example@gmail.com",
         "role": "user" / "admin",
         "official": true / false,
+        "phone_number": "+380999999999", // optional
         "description": "description"
     }
 }
@@ -120,6 +121,7 @@ response:
         "email": "example@gmail.com",
         "role": "user" / "admin",
         "official": true / false,
+        "phone_number": "+380999999999", // optional
         "description": "description"
     }
 }
@@ -162,6 +164,7 @@ response:
         "email": "example@gmail.com",
         "role": "user" / "admin",
         "official": true / false,
+        "phone_number": "+380999999999", // optional
         "description": "description"
     }
 }
@@ -186,6 +189,7 @@ response:
     "email": "example@gmail.com",
     "role": "user" / "admin",
     "official": true / false,
+    "phone_number": "+380999999999", // optional
     "description": "description"
 }
 ```
@@ -218,6 +222,7 @@ response:
     "email": "example@gmail.com",
     "role": "user" / "admin",
     "official": true / false,
+    "phone_number": "+380999999999", // optional
     "description": "description"
 }
 

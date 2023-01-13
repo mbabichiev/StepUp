@@ -76,7 +76,7 @@ class UserService {
     }
 
 
-    async updateUserById(updaterId, updatedLogin, login, firstname, lastname, email, description, role, official) {
+    async updateUserById(updaterId, updatedLogin, login, firstname, lastname, email, description, role, official, phone_number) {
         console.log(`Update user with login '${updatedLogin}' by user with id: ${updaterId}`);
 
         const userForUpdate = await UserModel.findOne({ login: updatedLogin });
@@ -92,6 +92,14 @@ class UserService {
             userForUpdate.login = login;
         }
 
+        if (email && userForUpdate.email !== email) {
+            const anotherUser = await UserModel.findOne({ email });
+            if (anotherUser) {
+                throw ErrorHandler.BadRequest(`Email '${email}' already in use`)
+            }
+            userForUpdate.email = email;
+        }
+
         if (firstname) {
             userForUpdate.firstname = firstname;
         }
@@ -100,12 +108,8 @@ class UserService {
             userForUpdate.lastname = lastname;
         }
 
-        if (email && userForUpdate.email !== email) {
-            const anotherUser = await UserModel.findOne({ email });
-            if (anotherUser) {
-                throw ErrorHandler.BadRequest(`Email '${email}' already in use`)
-            }
-            userForUpdate.email = email;
+        if(phone_number) {
+            userForUpdate.phone_number = phone_number;
         }
 
         if (description !== undefined) {

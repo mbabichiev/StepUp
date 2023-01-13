@@ -8,6 +8,7 @@ module.exports = class UserDto {
         this.email = model.email;
         this.role = model.role;
         this.official = model.official;
+        this.phone_number = model.phone_number;
         this.description = model.description ? model.description : null;
     }
 }

@@ -28,6 +28,9 @@ userRouter.put('/:login', authMidleware, forbiddenMiddleware,
     body('official')
         .if(body('official').exists())
         .isBoolean(),
+    body('phone_number')
+        .if(body('phone_number').exists())
+        .isMobilePhone(),
     userController.updateUserByLogin);
 
 userRouter.put('/:login/photo', authMidleware, forbiddenMiddleware, userController.updateUserPhotoByLogin);

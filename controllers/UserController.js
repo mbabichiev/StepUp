@@ -14,10 +14,10 @@ class UserController {
                 return next(ErrorHandler.BadRequest('Validation error', errors.array()));
             }
 
-            const {login, firstname, lastname, email, description, role, official} = request.body;
+            const {login, firstname, lastname, email, description, role, official, phone_number} = request.body;
             const {user} = request;
             const userLoginForUpdate = request.params.login;
-            await userService.updateUserById(user.id, userLoginForUpdate, login, firstname, lastname, email, description, role, official);
+            await userService.updateUserById(user.id, userLoginForUpdate, login, firstname, lastname, email, description, role, official, phone_number);
             
             return response.status(202).json();
         }
