@@ -1,5 +1,5 @@
 const fs = require("fs");
-const ErrorHandler = require('../exeptions/ErrorHandler');
+const ErrorHandler = require('../exceptions/ErrorHandler');
 
 class PhotoService {
 

@@ -1,5 +1,5 @@
 const CategoryDto = require('../dtos/CategoryDto');
-const ErrorHandler = require('../exeptions/ErrorHandler');
+const ErrorHandler = require('../exceptions/ErrorHandler');
 const CategoryModel = require('../models/Category');
 
 class CategoryService {

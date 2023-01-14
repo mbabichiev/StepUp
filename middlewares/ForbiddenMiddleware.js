@@ -1,4 +1,4 @@
-const ErrorHandler = require('../exeptions/ErrorHandler');
+const ErrorHandler = require('../exceptions/ErrorHandler');
 const UserModel = require('../models/User');
 
 module.exports = async function (request, response, next) {

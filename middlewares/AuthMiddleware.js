@@ -1,4 +1,4 @@
-const ErrorHandler = require('../exeptions/ErrorHandler');
+const ErrorHandler = require('../exceptions/ErrorHandler');
 const TokenService = require('../services/TokenService');
 
 const tokenService = new TokenService();

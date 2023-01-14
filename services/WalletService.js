@@ -1,4 +1,4 @@
-const ErrorHandler = require("../exeptions/ErrorHandler");
+const ErrorHandler = require("../exceptions/ErrorHandler");
 const WalletModel = require("../models/Wallet");
 const WalletDto = require("../dtos/WalletDto");
 const UserModel = require("../models/User");

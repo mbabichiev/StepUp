@@ -1,5 +1,5 @@
 const {validationResult} = require('express-validator');
-const ErrorHandler = require('../exeptions/ErrorHandler');
+const ErrorHandler = require('../exceptions/ErrorHandler');
 const categoryService = require('../services/CategoryService');
 
 class CategoryController {

@@ -1,4 +1,4 @@
-const ApiHandler = require('../exeptions/ErrorHandler');
+const ApiHandler = require('../exceptions/ErrorHandler');
 
 
 module.exports = function(error, request, response, next) {

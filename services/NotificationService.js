@@ -1,5 +1,5 @@
 const NotificationDto = require('../dtos/NotificationDto');
-const ErrorHandler = require('../exeptions/ErrorHandler');
+const ErrorHandler = require('../exceptions/ErrorHandler');
 const NotificationModel = require('../models/Notification');
 
 class NotificationService {

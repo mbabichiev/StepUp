@@ -1,4 +1,4 @@
-const ErrorHandler = require('../exeptions/ErrorHandler');
+const ErrorHandler = require('../exceptions/ErrorHandler');
 const EventModel = require('../models/Event');
 const UserModel = require('../models/User');
 const CommentModel = require('../models/Comment');

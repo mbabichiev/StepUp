@@ -1,6 +1,3 @@
-const UserModel = require('../models/User');
-const CategoryModel = require('../models/Category');
-
 module.exports = class EventDto {
     
     constructor(model, user, category) {
