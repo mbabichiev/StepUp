@@ -1276,6 +1276,10 @@ response: status 204
 
 `GET - /api/notifications` - get own notifications
 
+`Query params`:
+- `limit` (default `20`);
+- `page` (default `0`);
+
 ```JavaScript
 request: 'Bearer access_token' in Authorization
 ```
@@ -1296,3 +1300,5 @@ response:
 
 `Errors:`
 - `User is not authorized`
+- `Limit should be more than 0` 
+- `Page should be more than 0`
