@@ -10,6 +10,7 @@ const User = new Schema({
     official: {type: Boolean, default: false, required: true},
     phone_number: {type: String},
     role: {type: String, default: "user"},
+    subscribers: [{type: Schema.Types.ObjectId, ref: 'User'}],
     available_events: [{type: Schema.Types.ObjectId, ref: 'Event'}],
     time_admin: {type: Number}
 });

@@ -6,6 +6,7 @@ const UserDto = require('../dtos/UserDto');
 const ErrorHandler = require('../exeptions/ErrorHandler');
 const walletService = require('./WalletService');
 const EventModel = require('../models/Event');
+const UserLinkDto = require('../dtos/UserLinkDto');
 
 class UserService {
 
@@ -108,7 +109,7 @@ class UserService {
             userForUpdate.lastname = lastname;
         }
 
-        if(phone_number) {
+        if (phone_number) {
             userForUpdate.phone_number = phone_number;
         }
 
@@ -116,7 +117,7 @@ class UserService {
             userForUpdate.description = description;
         }
 
-        if(official !== undefined) {
+        if (official !== undefined) {
             userForUpdate.official = official;
         }
 
@@ -135,6 +136,88 @@ class UserService {
     }
 
 
+    async subscribeOnUserByLogin(subscriber_id, login) {
+        console.log("Subscribe fo user with login: " + login);
+
+        const user = await UserModel.findOne({ login });
+        if (!user) {
+            throw ErrorHandler.BadRequest(`User with login '${login}' not found`);
+        }
+
+        if (String(user._id) === String(subscriber_id)) {
+            throw ErrorHandler.BadRequest(`You can't subscribe on yourself`)
+        }
+
+        let indexOfSubscriberId = user.subscribers.indexOf(subscriber_id);
+        if (indexOfSubscriberId !== -1) {
+            throw ErrorHandler.BadRequest(`You are already subcriber of this user`);
+        }
+
+        user.subscribers.push(subscriber_id);
+        user.save();
+    }
+
+
+    async getSubscribers(login) {
+        console.log("Get subscribers for user with login: " + login);
+
+        const user = await UserModel.findOne({ login });
+        if (!user) {
+            throw ErrorHandler.BadRequest(`User with login '${login}' not found`);
+        }
+
+        if (user.subscribers.length === 0) {
+            return [];
+        }
+
+        const subscribers = await UserModel.find({ '_id': { $in: user.subscribers } });
+        const subscribersDto = [];
+
+        for (var i = 0; subscribers[i]; i++) {
+            subscribersDto.push(new UserLinkDto(subscribers[i]))
+        }
+
+        return subscribersDto;
+    }
+
+
+    async getFollowings(login) {
+        console.log("Get followings for user with login: " + login);
+
+        const user = await UserModel.findOne({ login });
+        if (!user) {
+            throw ErrorHandler.BadRequest(`User with login '${login}' not found`);
+        }
+
+        const followings = await UserModel.find({ subscribers: { $all: user._id } });
+        const followingsDto = [];
+
+        for (var i = 0; followings[i]; i++) {
+            followingsDto.push(new UserLinkDto(followings[i]))
+        }
+
+        return followingsDto;
+    }
+
+
+    async unsubscribeFromUserByLogin(subscriber_id, login) {
+        console.log("Unsubscribe from user with login: " + login);
+
+        const user = await UserModel.findOne({ login });
+        if (!user) {
+            throw ErrorHandler.BadRequest(`User with login '${login}' not found`);
+        }
+
+        let indexOfSubscriberId = user.subscribers.indexOf(subscriber_id);
+        if (indexOfSubscriberId === -1) {
+            throw ErrorHandler.BadRequest(`You are not subcriber of this user`);
+        }
+
+        user.subscribers.splice(indexOfSubscriberId, 1);
+        user.save();
+    }
+
+
     async deleteUserByLogin(login) {
         console.log("Delete user with login: " + login);
 
@@ -144,7 +227,7 @@ class UserService {
         }
 
         const event = await EventModel.findOne({ $and: [{ author_id: user._id }, { time_end: { $lt: Date.now() } }] });
-        if(event) {
+        if (event) {
             throw ErrorHandler.BadRequest("User has pending events");
         }
 

@@ -198,14 +198,50 @@ response:
 #
 
 <a name="users"><h2>Users</h2></a>
+- **subscribe on user**
+- **unsubscribe from user**
 - **get user by login**
 - **get user photo by login**
+- **get subscribers of user**
+- **get followings of user**
 - **get own user events by login**
 - **get events in which user subscribed by login**
 - **update user data by login**
 - **update user photo by login**
 - **delete user by login**
 - **delete user photo by login**
+
+#
+
+`POST - /api/users/:login/subscribe` - subscribe on user
+
+```JavaScript
+request: 'Bearer access_token' in Authorization
+```
+```JavaScript
+response: status 202
+```
+`Errors:`
+- `User is not authorized`
+- `User with login '{login}' not found`
+- `You can't subscribe on yourself`
+- `You are already subcriber of this user`
+
+#
+
+`POST - /api/users/:login/unsubscribe` - unsubscribe from user
+
+```JavaScript
+request: 'Bearer access_token' in Authorization
+```
+```JavaScript
+response: status 202
+```
+`Errors:`
+- `User is not authorized`
+- `User with login '{login}' not found`
+- `You are not subcriber of this user`
+
 #
 
 `GET - /api/users/:login` - get user info by login
@@ -239,6 +275,50 @@ response: photo
 ```
 `Errors:`
 - `No errors`
+
+#
+
+`GET - /api/users/:login/subscribers` - get subscribers of user by login
+
+If user don't have subscribers, you get empty array - `[]`.
+
+```JavaScript
+response: 
+[
+    {
+        "login": "login",
+        "firstname": "Firstname",
+        "lastname": "Lastname",
+        "official": true / false
+    },
+    ...
+]
+```
+
+`Errors:`
+- `User with login {login} not found`
+
+#
+
+`GET - /api/users/:login/followings` - get followings (users in which the user subscribed) of user by login
+
+If user don't have followings, you get empty array - `[]`.
+
+```JavaScript
+response: 
+[
+    {
+        "login": "login",
+        "firstname": "Firstname",
+        "lastname": "Lastname",
+        "official": true / false
+    },
+    ...
+]
+```
+
+`Errors:`
+- `User with login {login} not found`
 
 #
 
@@ -1086,7 +1166,7 @@ response:
     },
     "event_id": "event id", 
     "content": "Not bad", // f.e.
-    "publish_date": time in msc
+    "publish_date": time in ms
 }
 ```
 

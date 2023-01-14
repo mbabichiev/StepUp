@@ -42,6 +42,58 @@ class UserController {
     }
 
 
+    async subscribeOnUser(request, response, next) {
+        try {
+            const login = request.params.login;
+            const {user} = request;
+
+            await userService.subscribeOnUserByLogin(user.id, login);
+            return response.status(202).json();
+        }
+        catch(e) {
+            next(e);
+        }
+    }
+
+
+    async unsubscribeFromUser(request, response, next) {
+        try {
+            const login = request.params.login;
+            const {user} = request;
+
+            await userService.unsubscribeFromUserByLogin(user.id, login);
+            return response.status(202).json();
+        }
+        catch(e) {
+            next(e);
+        }
+    }
+
+
+    async getSubscribers(request, response, next) {
+        try {
+            const login = request.params.login;
+            const users = await userService.getSubscribers(login);
+            return response.status(200).json(users);
+        }
+        catch(e) {
+            next(e);
+        }
+    }
+
+
+    async getFollowings(request, response, next) {
+        try {
+            const login = request.params.login;
+            const users = await userService.getFollowings(login);
+            return response.status(200).json(users);
+        }
+        catch(e) {
+            next(e);
+        }
+    }
+
+
     async getUserByLogin(request, response, next) {
         try {
             const login = request.params.login;

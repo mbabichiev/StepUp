@@ -34,10 +34,17 @@ userRouter.put('/:login', authMidleware, forbiddenMiddleware,
     userController.updateUserByLogin);
 
 userRouter.put('/:login/photo', authMidleware, forbiddenMiddleware, userController.updateUserPhotoByLogin);
+
+userRouter.post('/:login/subscribe', authMidleware, userController.subscribeOnUser);
+userRouter.post('/:login/unsubscribe', authMidleware, userController.unsubscribeFromUser);
+
 userRouter.get('/:login', userController.getUserByLogin);
 userRouter.get('/:login/photo', userController.getUserPhotoByLogin);
 userRouter.get('/:login/events', eventController.getUserEventsByQueryParams);
 userRouter.get('/:login/events/signed', eventController.getSignedEventsByQueryParams);
+userRouter.get('/:login/subscribers',userController.getSubscribers);
+userRouter.get('/:login/followings', userController.getFollowings);
+
 userRouter.delete('/:login', authMidleware, forbiddenMiddleware, userController.deleteUserByLogin);
 userRouter.delete('/:login/photo', authMidleware, forbiddenMiddleware, userController.deleteUserPhotoByLogin);
 
