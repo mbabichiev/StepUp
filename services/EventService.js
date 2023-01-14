@@ -6,6 +6,7 @@ const CategoryModel = require('../models/Category');
 const EventModel = require('../models/Event');
 const UserModel = require('../models/User');
 const WalletModel = require("../models/Wallet");
+const Notificater = require('../utils/Notificater');
 const PhotoService = require('./PhotoService');
 
 
@@ -56,6 +57,16 @@ class EventService {
             time_start: time_start,
             time_end: time_end
         });
+
+        Notificater.notificateOtherUsers(
+            name, 
+            `User @${user.login} notificated you in name of event "${event.name}"`,
+            `${process.env.CLIENT_URL}/events/${event._id}`);
+
+        Notificater.notificateOtherUsers(
+            description, 
+            `User @${user.login} notificated you in description of event "${event.name}"`,
+            `${process.env.CLIENT_URL}/events/${event._id}`);
 
         const eventDto = new EventDto(event, user, category);
         return eventDto;

@@ -7,6 +7,7 @@
 - [Wallets](#wallets)
 - [Likes](#likes)
 - [Comments](#comments)
+- [Notifications](#notifications)
 
 
 #
@@ -1253,3 +1254,45 @@ response: status 204
 
 #
 
+<a name="notifications"><h2>Notifications</h2></a>
+
+**`You can notificate user in comments, event name or event description. To do it write text with '@' and login of user. For example:`**
+
+***`Comment: "I was with @login and it's fantastic!"`***
+
+***`Event name: "Paty with @login and @login near shop @loginshop"`***
+
+***`Description: "Me and @login decided to organized..."`***
+
+#
+
+**`Warning.` User don't get notification if you `update` your comment / event name / event description**
+
+#
+
+- **Get notifications**
+
+#
+
+`GET - /api/notifications` - get own notifications
+
+```JavaScript
+request: 'Bearer access_token' in Authorization
+```
+```JavaScript
+response:
+[
+    {
+        "id": "notification id",
+        "content": "User @mbabichiev notificated you in comments under event \"Event name\"", // f.e.
+        "link": "http://localhost:3000/events/event_id",
+        "date": time in ms
+    },
+    ...
+]
+```
+
+#
+
+`Errors:`
+- `User is not authorized`

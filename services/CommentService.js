@@ -3,6 +3,7 @@ const EventModel = require('../models/Event');
 const UserModel = require('../models/User');
 const CommentModel = require('../models/Comment');
 const CommentDto = require('../dtos/CommentDto');
+const Notificater = require('../utils/Notificater');
 
 class CommentService {
 
@@ -26,8 +27,12 @@ class CommentService {
             publish_date: Date.now()
         });
 
-        const commentDto = new CommentDto(comment, user);
+        Notificater.notificateOtherUsers(
+            content, 
+            `User @${user.login} notificated you in comments under event "${event.name}"`,
+            `${process.env.CLIENT_URL}/events/${event._id}`);
 
+        const commentDto = new CommentDto(comment, user);
         return commentDto;
     }
 
@@ -60,15 +65,15 @@ class CommentService {
             throw ErrorHandler.BadRequest("Sort should be 'new' or 'old'");
         }
 
-        if(!limit) {
+        if (!limit) {
             limit = 10;
         }
 
-        if(!sort) {
+        if (!sort) {
             sort = 'new';
         }
 
-        if(!page) {
+        if (!page) {
             page = 0;
         }
 
@@ -81,21 +86,21 @@ class CommentService {
 
         let comments;
         page++;
-        if(sort === 'new') {
-            comments = await CommentModel.find({event_id: event_id})
+        if (sort === 'new') {
+            comments = await CommentModel.find({ event_id: event_id })
                 .skip(page > 0 ? ((page - 1) * limit) : 0)
                 .limit(limit)
-                .sort({publish_date: -1});
+                .sort({ publish_date: -1 });
         }
-        else if(sort === 'old') {
-            comments = await CommentModel.find({event_id: event_id})
+        else if (sort === 'old') {
+            comments = await CommentModel.find({ event_id: event_id })
                 .skip(page > 0 ? ((page - 1) * limit) : 0)
                 .limit(limit)
-                .sort({publish_date: 1});
+                .sort({ publish_date: 1 });
         }
 
         const commentsDto = [];
-        for(var i = 0; comments[i]; i++) {
+        for (var i = 0; comments[i]; i++) {
             const user = await UserModel.findById(comments[i].author_id);
             commentsDto.push(new CommentDto(comments[i], user));
         }
@@ -107,7 +112,7 @@ class CommentService {
     async updateById(id, content) {
         console.log("Update comment with id: " + id);
 
-        if(!content) {
+        if (!content) {
             return;
         }
 
@@ -123,7 +128,7 @@ class CommentService {
 
     async deleteById(id) {
         console.log("Delete comment with id: " + id);
-        
+
         const comment = await CommentModel.findById(id);
         if (!comment) {
             throw ErrorHandler.BadRequest(`Comment with id '${id}' not found`);
