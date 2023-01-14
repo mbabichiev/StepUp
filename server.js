@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const router = require('./router/index');
 const errorMiddleware = require('./middlewares/ErrorMiddleware');
+const eventService = require('./services/EventService');
 
 const PORT = process.env.SERVER_URL.split(':')[2] || 8080;
 const app = express();
@@ -34,6 +35,9 @@ const start = async () => {
     catch(e) {
         console.log(e);
     }
+    setInterval(function() {
+        eventService.setActiveEventsInactive();
+    }, 60 * 1000); // every minute
 } 
 
 

@@ -401,6 +401,27 @@ class EventService {
         await EventModel.findByIdAndDelete(id);
     }
 
+
+    async setActiveEventsInactive() {
+        console.log("\nFinding for active events in the past...");
+
+        const events = await EventModel.find({ $and: [{ active: true }, { time_end: { $lt: Date.now() } }] });
+
+        for(var i = 0; events[i]; i++) {
+            console.log(`Set field 'active: false' for event with id: ${events[i]._id}`);
+            events[i].active = false;
+            events[i].save();
+        }
+
+        if(events.length === 0) {
+            console.log("Nothing to update\n")
+        }
+        else {
+            console.log("Updated successfully\n")
+        }
+    }
+
+
 }
 
 module.exports = new EventService();
