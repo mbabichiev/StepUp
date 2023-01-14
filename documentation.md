@@ -359,8 +359,8 @@ response:
         "price": 0,
         "likes": 0,
         "active": true,
-        "time_start": time in msc,
-        "time_end": time in msc
+        "time_start": time in ms,
+        "time_end": time in ms
     },
     ...
 ]
@@ -412,8 +412,8 @@ response:
         "price": 0,
         "likes": 0,
         "active": true,
-        "time_start": time in msc,
-        "time_end": time in msc
+        "time_start": time in ms,
+        "time_end": time in ms
     },
     ...
 ]
@@ -543,8 +543,8 @@ request:
     "people_limit": 30, // optional
     "category_id": "category id",
     "price": 100, // if it's free, set 0
-    "time_start": time in msc,
-    "time_end": time in msc
+    "time_start": time in ms,
+    "time_end": time in ms
 }
 ```
 ```JavaScript
@@ -574,8 +574,8 @@ response:
     "price": 0,
     "likes": 0,
     "active": true,
-    "time_start": time in msc,
-    "time_end": time in msc
+    "time_start": time in ms,
+    "time_end": time in ms
 }
 ```
 `Errors:`
@@ -648,8 +648,8 @@ request:
     "house_number": "79/1",
     "people_limit": 30, 
     "category_id": "category id",
-    "time_start": time in msc,
-    "time_end": time in msc
+    "time_start": time in ms,
+    "time_end": time in ms
 }
 ```
 ```JavaScript
@@ -729,8 +729,8 @@ response:
     "price": 0, // f.e.
     "likes": 0, // f.e.
     "active": true / false,
-    "time_start": time in msc,
-    "time_end": time in msc
+    "time_start": time in ms,
+    "time_end": time in ms
 }
 ```
 `Errors:`
@@ -783,8 +783,8 @@ response:
         "price": 0,
         "likes": 0,
         "active": true,
-        "time_start": time in msc,
-        "time_end": time in msc
+        "time_start": time in ms,
+        "time_end": time in ms
     },
     ...
 ]
@@ -837,8 +837,8 @@ response:
         "price": 0,
         "likes": 0,
         "active": true,
-        "time_start": time in msc,
-        "time_end": time in msc
+        "time_start": time in ms,
+        "time_end": time in ms
     },
     ...
 ]
@@ -1221,7 +1221,7 @@ response:
         },
         "event_id": "event id",
         "content": "Not bad", // f.e.
-        "publish_date": time in msc
+        "publish_date": time in ms
     },
     ...
 ]
