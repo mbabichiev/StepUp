@@ -1,6 +1,8 @@
 const CategoryDto = require('../dtos/CategoryDto');
 const ErrorHandler = require('../exceptions/ErrorHandler');
 const CategoryModel = require('../models/Category');
+const categoryRepository = require('../repositories/CategoryRepository');
+
 
 class CategoryService {
 
@@ -16,36 +18,21 @@ class CategoryService {
             name: name
         });
 
-        const categoryDto = new CategoryDto(category);
-        return categoryDto;
+        return new CategoryDto(category);
     }
 
 
     async getById(id) {
         console.log("Get category with id: " + id);
-
-        const category = await CategoryModel.findById(id);
-        if (!category) {
-            throw ErrorHandler.BadRequest("Category with id " + id + " not found");
-        }
-
-        const categoryDto = new CategoryDto(category);
-
-        return categoryDto;
+        const category = await categoryRepository.findById(id);
+        return new CategoryDto(category);
     }
 
 
     async getByName(name) {
         console.log("Get category with name: " + name);
-
-        const category = await CategoryModel.findOne({ name });
-        if (!category) {
-            throw ErrorHandler.BadRequest("Category not found");
-        }
-
-        const categoryDto = new CategoryDto(category);
-
-        return categoryDto;
+        const category = await categoryRepository.findByName(name);
+        return new CategoryDto(category);
     }
 
 
@@ -65,31 +52,25 @@ class CategoryService {
     async updateById(id, name) {
         console.log("Update category with id: " + id);
 
-        const category = await CategoryModel.findById(id);
-        if (!category) {
-            throw ErrorHandler.BadRequest("Category with id " + id + " not found");
-        }
+        const category = await categoryRepository.findById(id);
 
         if(name && category.name !== name) {
             if(await CategoryModel.findOne({name})) {
                 throw ErrorHandler.BadRequest(`Category with name '${name}' already exists`)
             }
             category.name = name;
-        } 
+        }
 
-        await category.save();
+        category.save();
     }
 
 
     async deleteById(id) {
         console.log("Delete category with id: " + id);
-
-        if (!await CategoryModel.findById(id)) {
-            throw ErrorHandler.BadRequest("Category with id " + id + " not found");
-        }
-
-        await CategoryModel.findByIdAndDelete(id);
+        const category = await categoryRepository.findById(id);
+        category.deleteOne();
     }
 }
+
 
 module.exports = new CategoryService();

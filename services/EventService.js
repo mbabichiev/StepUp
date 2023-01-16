@@ -8,6 +8,9 @@ const UserModel = require('../models/User');
 const WalletModel = require("../models/Wallet");
 const Notificater = require('../utils/Notificater');
 const PhotoService = require('./PhotoService');
+const userRepository = require('../repositories/UserRepository');
+const categoryRepository = require('../repositories/CategoryRepository');
+const eventRepository = require('../repositories/EventRepository');
 
 
 class EventService {
@@ -18,28 +21,16 @@ class EventService {
 
         console.log("Create event with name: " + name);
 
-        const user = await UserModel.findById(author_id);
-        if (!user) {
-            throw ErrorHandler.BadRequest("User not found");
-        }
-
         if (time_start < Date.now()) {
             throw ErrorHandler.BadRequest(`You cannot create an event in the past`);
         }
-
         if (time_end - time_start < 1800000) {
             throw ErrorHandler.BadRequest("The event must last at least 30 minutes");
         }
 
-        const category = await CategoryModel.findById(category_id);
-        if (!category) {
-            throw ErrorHandler.BadRequest("Category not found");
-        }
-
-        const position = await GeocodingAPI.getCoordinates(country, city, street, house_number);
-        if (!position) {
-            throw ErrorHandler.BadRequest("Coordinates at this address not found");
-        }
+        const user = await userRepository.findById(author_id);
+        const category = await categoryRepository.findById(category_id);
+        const position = await GeocodingAPI.getCoordinatesByAddress(country, city, street, house_number);
 
         const event = await EventModel.create({
             author_id: author_id,
@@ -59,103 +50,35 @@ class EventService {
         });
 
         Notificater.notificateOtherUsers(
-            name, 
+            name,
             `User @${user.login} notificated you in name of event "${event.name}"`,
             `${process.env.CLIENT_URL}/events/${event._id}`);
 
         Notificater.notificateOtherUsers(
-            description, 
+            description,
             `User @${user.login} notificated you in description of event "${event.name}"`,
             `${process.env.CLIENT_URL}/events/${event._id}`);
 
-        const eventDto = new EventDto(event, user, category);
-        return eventDto;
+        return new EventDto(event, user, category);
     }
 
 
     async getById(id) {
         console.log("Get event with id: " + id);
 
-        const event = await EventModel.findById(id);
-        if (!event) {
-            throw ErrorHandler.BadRequest("Event not found");
-        }
-
-        const user = await UserModel.findById(event.author_id);
-        if (!user) {
-            throw ErrorHandler.BadRequest("User not found");
-        }
-
+        const event = await eventRepository.findById(id);
+        const user = await userRepository.findById(event.author_id);
         const category = await CategoryModel.findById(event.category_id);
-        if (!category) {
-            throw ErrorHandler.BadRequest("Category not found");
-        }
 
-        const eventDto = new EventDto(event, user, category);
-        return eventDto;
+        return new EventDto(event, user, category);
     }
 
 
     async #getByConditionLimitSortTypePage(condition, limit, sort, type, page) {
-        if (limit && limit < 0) {
-            throw ErrorHandler.BadRequest("Limit should be more than 0");
-        }
-
-        if (page && page < 0) {
-            throw ErrorHandler.BadRequest('Page should be more than 0');
-        }
-
-        if (sort && sort !== 'earliest' && sort !== 'latest' && sort !== 'popular') {
-            throw ErrorHandler.BadRequest("Sort should be 'earliest', 'latest' or 'popular'");
-        }
-
-        if (type && type !== 'active' && type !== 'inactive') {
-            throw ErrorHandler.BadRequest("Type should be 'active' or 'inactive'");
-        }
-
-
-        if (!limit) {
-            limit = 10;
-        }
-
-        if (!sort) {
-            sort = 'earliest';
-        }
-
-        if (!page) {
-            page = 0;
-        }
-
-        let sorting = {};
-        if (sort === 'latest') {
-            sorting = { time_start: 1 };
-        }
-        else if (sort === 'earliest') {
-            sorting = { time_start: -1 };
-        }
-        else if (sort === 'popular') {
-            sorting = { likes: -1 };
-        }
-
-        let active = {};
-        if (type === 'inactive') {
-            active = { active: false };
-        }
-        else if (type === 'active') {
-            active = { active: true };
-        }
-
         console.log(`Get page of event with limit: ${limit}, sort: '${sort}', page: ${page}, type: '${type}'`);
 
-        page++;
-
-        const events = await EventModel.find({ $and: [condition, active] })
-            .limit(limit)
-            .skip(page > 0 ? ((page - 1) * limit) : 0)
-            .sort(sorting);
-
+        const events = await eventRepository.findByParams(condition, limit, sort, type, page);
         const eventsDto = [];
-
         for (var i = 0; events[i]; i++) {
             const user = await UserModel.findById(events[i].author_id);
             const category = await CategoryModel.findById(events[i].category_id);
@@ -170,11 +93,7 @@ class EventService {
     async getByLoginLimitSortTypePage(login, limit, sort, type, page) {
         console.log(`Get page of event for user '${login}' with limit: ${limit}, sort: '${sort}', page: ${page}, type: '${type}'`);
 
-        const user = await UserModel.findOne({ login });
-        if (!user) {
-            throw ErrorHandler.BadRequest(`User with login '${login}' not found`);
-        }
-
+        const user = await userRepository.findByLogin(login);
         const condition = { author_id: user._id };
         return await this.#getByConditionLimitSortTypePage(condition, limit, sort, type, page);
     }
@@ -202,13 +121,6 @@ class EventService {
         console.log(`Get page of event by ip ${ip} with limit: ${limit}, sort: '${sort}', page: ${page}, type: '${type}'`);
 
         const coordinates = await GeocodingAPI.getCoordinatesByIp(ip);
-
-        if (!coordinates) {
-            throw ErrorHandler.BadRequest("Ip address not correct");
-        }
-
-        console.log(coordinates)
-
         const size_for_find = 2;
 
         const condition = {
@@ -225,12 +137,9 @@ class EventService {
     async getSignedUserEventsByLoginLimitSortTypePage(login, limit, sort, type, page) {
         console.log(`Get page of signed event for user '${login}' with limit: ${limit}, sort: '${sort}', page: ${page}, type: '${type}'`);
 
-        const user = await UserModel.findOne({ login });
-        if (!user) {
-            throw ErrorHandler.BadRequest(`User with login '${login}' not found`);
-        }
-
+        const user = await userRepository.findByLogin(login);
         const condition = { '_id': { $in: user.available_events } };
+
         return await this.#getByConditionLimitSortTypePage(condition, limit, sort, type, page);
     }
 
@@ -238,33 +147,10 @@ class EventService {
     async getSubscribersOfEventByEventId(id, limit, page) {
         console.log("Get page of subscribers of event with id: " + id + " and with limit: " + limit + " and page: " + page);
 
-        if (limit && limit < 0) {
-            throw ErrorHandler.BadRequest("Limit should be more than 0");
-        }
+        const event = await eventRepository.findById(id);
+        const subscribers = await userRepository.findByParams({ '_id': { $in: event.subscribers } }, limit, page);
 
-        if (page && page < 0) {
-            throw ErrorHandler.BadRequest('Page should be more than 0');
-        }
-
-        if (!limit) {
-            limit = 30;
-        }
-
-        if (!page) {
-            page = 0;
-        }
-
-        const event = await EventModel.findById(id);
-        if (!event) {
-            throw ErrorHandler.BadRequest(`Event with id ${id} not found`);
-        }
-
-        page++;
-        const subscribers = await UserModel.find({ '_id': { $in: event.subscribers } })
-            .limit(limit)
-            .skip(page > 0 ? ((page - 1) * limit) : 0);
         const subscribersDto = [];
-
         for (var i = 0; subscribers[i]; i++) {
             subscribersDto.push(new UserLinkDto(subscribers[i]));
         }
@@ -278,10 +164,7 @@ class EventService {
 
         console.log("Update event with id: " + id);
 
-        const event = await EventModel.findById(id);
-        if (!event) {
-            throw ErrorHandler.BadRequest("Event not found");
-        }
+        const event = await eventRepository.findById(id);
 
         if (name && event.name !== name) {
             event.name = name;
@@ -308,11 +191,14 @@ class EventService {
         }
 
         if (active !== undefined && event.active !== active) {
+            if(Date.now() > event.time_end) {
+                throw ErrorHandler("You can't change status of finished event");
+            }
             event.active = active;
         }
 
         if (country || city || street || house_number) {
-            const position = await GeocodingAPI.getCoordinates(event.country, event.city, event.street, event.house_number);
+            const position = await GeocodingAPI.getCoordinatesByAddress(event.country, event.city, event.street, event.house_number);
             if (!position) {
                 throw ErrorHandler.BadRequest("Coordinates at this address not found");
             }
@@ -329,9 +215,7 @@ class EventService {
         }
 
         if (category_id && String(event.category_id) !== category_id) {
-            if (!await CategoryModel.findById(category_id)) {
-                throw ErrorHandler.BadRequest("Category not found");
-            }
+            await categoryRepository.findById(category_id);
             event.category_id = category_id;
         }
 
@@ -362,19 +246,16 @@ class EventService {
             }
             event.time_end = time_end;
         }
-        await event.save();
+        event.save();
     }
 
 
     async deleteById(id) {
-        const event = await EventModel.findById(id);
-        if (!event) {
-            throw ErrorHandler.BadRequest("Event not found");
-        }
+        const event = await eventRepository.findById(id);
+        PhotoService.deleteEventPhotoById(id);
 
         if (event.time_end < Date.now()) {
-            PhotoService.deleteEventPhotoById(id);
-            await EventModel.findByIdAndDelete(id);
+            event.deleteOne();
             return;
         }
 
@@ -405,11 +286,10 @@ class EventService {
         }
 
         if (event.price !== 0) {
-            await author_wallet.save();
+            author_wallet.save();
         }
 
-        PhotoService.deleteEventPhotoById(id);
-        await EventModel.findByIdAndDelete(id);
+        event.deleteOne();
     }
 
 
@@ -418,21 +298,19 @@ class EventService {
 
         const events = await EventModel.find({ $and: [{ active: true }, { time_end: { $lt: Date.now() } }] });
 
-        for(var i = 0; events[i]; i++) {
+        for (var i = 0; events[i]; i++) {
             console.log(`Set field 'active: false' for event with id: ${events[i]._id}`);
             events[i].active = false;
             events[i].save();
         }
 
-        if(events.length === 0) {
+        if (events.length === 0) {
             console.log("Nothing to update\n")
         }
         else {
             console.log("Updated successfully\n")
         }
     }
-
-
 }
 
 module.exports = new EventService();

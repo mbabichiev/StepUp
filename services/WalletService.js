@@ -4,6 +4,9 @@ const WalletDto = require("../dtos/WalletDto");
 const UserModel = require("../models/User");
 const EventModel = require("../models/Event");
 const mongoose = require('mongoose');
+const walletRepository = require("../repositories/WalletRepository");
+const eventRepository = require("../repositories/EventRepository");
+const userRepository = require("../repositories/UserRepository");
 
 class WalletService {
 
@@ -25,11 +28,7 @@ class WalletService {
     async getAmountByUserId(user_id) {
         console.log("Get amount of wallet by user id: " + user_id);
 
-        const wallet = await WalletModel.findOne({ user_id });
-        if (!wallet) {
-            throw ErrorHandler.BadRequest("Wallet not found");
-        }
-
+        const wallet = await walletRepository.findByUserId(user_id);
         return { amount: wallet.amount };
     }
 
@@ -37,14 +36,7 @@ class WalletService {
     async addMoneyToWalletByUserId(user_id, amount) {
         console.log("Add amount " + amount + " to wallet by user id: " + user_id);
 
-        let wallet = await WalletModel.findOne({ user_id });
-        if (!wallet) {
-            wallet = await WalletModel.create({
-                user_id: user_id,
-                amount: amount
-            });
-            return;
-        }
+        const wallet = await walletRepository.findByUserId(user_id);
 
         wallet.amount += Number(amount);
         wallet.save();
@@ -54,10 +46,7 @@ class WalletService {
     async withdrawMoneyByUserId(user_id, amount) {
         console.log("Withdraw amount " + amount + " from wallet by user id: " + user_id);
 
-        let wallet = await WalletModel.findOne({ user_id });
-        if (!wallet) {
-            throw ErrorHandler.BadRequest("You don't have wallet")
-        }
+        const wallet = await walletRepository.findByUserId(user_id);
 
         const pending_event = await EventModel.findOne({ $and: [{ author_id: user_id }, { time_end: { $lt: Date.now() } }] });
         if (pending_event) {
@@ -69,17 +58,14 @@ class WalletService {
         }
 
         wallet.amount -= Number(amount);
-        await wallet.save();
+        wallet.save();
     }
 
 
     async payForEvent(user_id, event_id) {
         console.log("Paying for event with id: " + event_id + " by user with id: " + user_id);
 
-        const event = await EventModel.findById(event_id);
-        if (!event) {
-            throw ErrorHandler.BadRequest("Event with id " + event_id + " not found");
-        }
+        const event = await eventRepository.findById(event_id);
 
         if (event.author_id == user_id) {
             throw ErrorHandler.BadRequest("You can't subscribe to your event")
@@ -93,25 +79,22 @@ class WalletService {
             throw ErrorHandler.BadRequest("Event with id " + event_id + " not active");
         }
 
-        const user = await UserModel.findById(user_id);
-        if (!user) {
-            throw ErrorHandler.BadRequest("User with id " + user_id + " not found");
-        }
+        const user = await userRepository.findById(user_id);
 
         let from_wallet;
 
         if (event.price !== 0) {
-            from_wallet = await WalletModel.findOne({ user_id: user._id });
+            from_wallet = await walletRepository.findByUserId(user._id);
             if (from_wallet.amount < event.price) {
                 throw ErrorHandler.BadRequest("You don't have money");
             }
         }
 
-        const to_user = await UserModel.findById(event.author_id);
+        const to_user = await userRepository.findById(event.author_id);
 
         let to_wallet;
         if (event.price !== 0) {
-            to_wallet = await WalletModel.findOne({ user_id: to_user._id });
+            to_wallet = await walletRepository.findByUserId(to_user._id);
         }
 
         const session = await mongoose.startSession();
@@ -153,35 +136,21 @@ class WalletService {
     async unsubscribeFromEventAndReturnMoney(user_id, event_id) {
         console.log("Unsubscribe from event with id: " + event_id + " by user with id: " + user_id);
 
-        const event = await EventModel.findById(event_id);
-        if (!event) {
-            throw ErrorHandler.BadRequest("Event with id " + event_id + " not found");
-        }
+        const event = await eventRepository.findById(event_id);
 
         if (event.subscribers.indexOf(user_id) === -1) {
             throw ErrorHandler.BadRequest("You didn't subscribe for this event");
         }
 
-        const user = await UserModel.findById(user_id);
-        const author_of_event = await UserModel.findById(event.author_id);
+        const user = await userRepository.findById(user_id);
+        const author_of_event = await userRepository.findById(event.author_id);
 
         let user_wallet;
         let author_of_event_wallet;
 
         if (event.price !== 0) {
-            user_wallet = await WalletModel.findById(user.wallet_id);
-            if (!user_wallet) {
-                user_wallet = await WalletModel.create({
-                    user_id: user_id
-                });
-            }
-
-            author_of_event_wallet = await WalletModel.findById(author_of_event.wallet_id);
-            if (!author_of_event_wallet) {
-                author_of_event_wallet = await WalletModel.create({
-                    user_id: author_of_event._id
-                });
-            }
+            user_wallet = await walletRepository.findById(user.wallet_id);
+            author_of_event_wallet = await walletRepository.findById(author_of_event.wallet_id);
         }
 
         const session = await mongoose.startSession();

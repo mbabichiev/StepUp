@@ -7,6 +7,8 @@ const ErrorHandler = require('../exceptions/ErrorHandler');
 const walletService = require('./WalletService');
 const EventModel = require('../models/Event');
 const UserLinkDto = require('../dtos/UserLinkDto');
+const userRepository = require('../repositories/UserRepository');
+
 
 class UserService {
 
@@ -37,8 +39,7 @@ class UserService {
             });
 
         const wallet = await walletService.createWallet(user._id);
-
-        user.wallet_id = wallet.id;
+        user.wallet_id = wallet._id;
         user.save();
 
         const userDto = new UserDto(user);
@@ -53,37 +54,24 @@ class UserService {
 
     async getUserByLogin(login) {
         console.log("Get user with login: " + login);
-        const user = await UserModel.findOne({ login });
 
-        if (!user) {
-            throw ErrorHandler.BadRequest(`User with login ${login} not found`);
-        }
-
-        const userDto = new UserDto(user);
-        return { ...userDto }
+        const user = await userRepository.findByLogin(login);
+        return new UserDto(user);
     }
 
 
     async getUserById(id) {
         console.log("Get user with id: " + id);
-        const user = await UserModel.findById(id);
 
-        if (!user) {
-            throw ErrorHandler.BadRequest(`User not found`);
-        }
-
-        const userDto = new UserDto(user);
-        return { ...userDto }
+        const user = await userRepository.findById(id);
+        return new UserDto(user);
     }
 
 
     async updateUserById(updaterId, updatedLogin, login, firstname, lastname, email, description, role, official, phone_number) {
         console.log(`Update user with login '${updatedLogin}' by user with id: ${updaterId}`);
 
-        const userForUpdate = await UserModel.findOne({ login: updatedLogin });
-        if (!userForUpdate) {
-            throw ErrorHandler.BadRequest(`User with login '${updatedLogin}' not found`);
-        }
+        const userForUpdate = await userRepository.findByLogin(updatedLogin);
 
         if (login && userForUpdate.login !== login) {
             if (await UserModel.findOne({ login })) {
@@ -132,17 +120,14 @@ class UserService {
             }
         }
 
-        await userForUpdate.save();
+        userForUpdate.save();
     }
 
 
     async subscribeOnUserByLogin(subscriber_id, login) {
         console.log("Subscribe fo user with login: " + login);
 
-        const user = await UserModel.findOne({ login });
-        if (!user) {
-            throw ErrorHandler.BadRequest(`User with login '${login}' not found`);
-        }
+        const user = await userRepository.findByLogin(login);
 
         if (String(user._id) === String(subscriber_id)) {
             throw ErrorHandler.BadRequest(`You can't subscribe on yourself`)
@@ -161,11 +146,7 @@ class UserService {
     async getSubscribers(login) {
         console.log("Get subscribers for user with login: " + login);
 
-        const user = await UserModel.findOne({ login });
-        if (!user) {
-            throw ErrorHandler.BadRequest(`User with login '${login}' not found`);
-        }
-
+        const user = await userRepository.findByLogin(login);
         if (user.subscribers.length === 0) {
             return [];
         }
@@ -184,11 +165,7 @@ class UserService {
     async getFollowings(login) {
         console.log("Get followings for user with login: " + login);
 
-        const user = await UserModel.findOne({ login });
-        if (!user) {
-            throw ErrorHandler.BadRequest(`User with login '${login}' not found`);
-        }
-
+        const user = await userRepository.findByLogin(login);
         const followings = await UserModel.find({ subscribers: { $all: user._id } });
         const followingsDto = [];
 
@@ -203,10 +180,7 @@ class UserService {
     async unsubscribeFromUserByLogin(subscriber_id, login) {
         console.log("Unsubscribe from user with login: " + login);
 
-        const user = await UserModel.findOne({ login });
-        if (!user) {
-            throw ErrorHandler.BadRequest(`User with login '${login}' not found`);
-        }
+        const user = await userRepository.findByLogin(login);
 
         let indexOfSubscriberId = user.subscribers.indexOf(subscriber_id);
         if (indexOfSubscriberId === -1) {
@@ -221,17 +195,14 @@ class UserService {
     async deleteUserByLogin(login) {
         console.log("Delete user with login: " + login);
 
-        const user = await UserModel.findOne({ login });
-        if (!user) {
-            throw ErrorHandler.BadRequest(`User with login '${login}' not found`);
-        }
+        const user = await userRepository.findByLogin(login);
 
         const event = await EventModel.findOne({ $and: [{ author_id: user._id }, { time_end: { $lt: Date.now() } }] });
         if (event) {
             throw ErrorHandler.BadRequest("User has pending events");
         }
-
-        await UserModel.findOneAndDelete({ login });
+        
+        user.deleteOne();
     }
 
 
