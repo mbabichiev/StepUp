@@ -36,13 +36,13 @@ class Notificater {
                 continue;
             }
 
-            const notification = await NotificationModel.create({
+            NotificationModel.create({
                 user_id: user_in_notification._id,
                 content: nameOfNotifications,
-                link: link
+                link: link,
+                sent_to_telegram: user_in_notification.chat_id ? false : null,
+                chat_id: user_in_notification.chat_id
             })
-
-            console.log(`Notification with id ${notification._id} created`);
         }
     }
 

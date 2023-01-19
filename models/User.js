@@ -9,6 +9,7 @@ const User = new Schema({
     description: {type: String},
     official: {type: Boolean, default: false, required: true},
     phone_number: {type: String},
+    chat_id: {type: Number, unique: true},
     wallet_id: {type: Schema.Types.ObjectId, ref: 'Wallet'},
     role: {type: String, default: "user"},
     subscribers: [{type: Schema.Types.ObjectId, ref: 'User'}],
