@@ -22,7 +22,7 @@ class UserRepository {
     }
 
 
-    async findByParams(condition, limit, page) {
+    async findByParams(condition, limit, page, sort = {}) {
         if (limit && limit < 0) {
             throw ErrorHandler.BadRequest("Limit should be more than 0");
         }
@@ -40,7 +40,8 @@ class UserRepository {
         page++;
         return await UserModel.find(condition)
             .limit(limit)
-            .skip(page > 0 ? ((page - 1) * limit) : 0);
+            .skip(page > 0 ? ((page - 1) * limit) : 0)
+            .sort(sort);
     }
 
 }

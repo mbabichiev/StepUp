@@ -68,6 +68,28 @@ class UserService {
     }
 
 
+    async getByLimitSortPage(limit, sort, page) {
+        console.log(`Get users by limit: ${limit}, sort: ${sort}, page: ${page}`);
+
+        if(!sort) {
+            sort = "new";
+        }
+
+        let sorting = {};
+        if(sort === 'new') {
+            sorting = { _id: -1 };
+        }
+
+        const users = await userRepository.findByParams({}, limit, page, sorting);
+        const usersDto = [];
+        for (var i = 0; users[i]; i++) {
+            usersDto.push(new UserDto(users[i]));
+        }
+
+        return usersDto;
+    }
+
+
     async updateUserById(updaterId, updatedLogin, login, firstname, lastname, email, description, role, official, phone_number) {
         console.log(`Update user with login '${updatedLogin}' by user with id: ${updaterId}`);
 
@@ -201,7 +223,7 @@ class UserService {
         if (event) {
             throw ErrorHandler.BadRequest("User has pending events");
         }
-        
+
         user.deleteOne();
     }
 

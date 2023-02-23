@@ -38,6 +38,7 @@ userRouter.put('/:login/photo', authMidleware, forbiddenMiddleware, userControll
 userRouter.post('/:login/subscribe', authMidleware, userController.subscribeOnUser);
 userRouter.post('/:login/unsubscribe', authMidleware, userController.unsubscribeFromUser);
 
+userRouter.get('/', userController.getAllUsers);
 userRouter.get('/:login', userController.getUserByLogin);
 userRouter.get('/:login/photo', userController.getUserPhotoByLogin);
 userRouter.get('/:login/events', eventController.getUserEventsByQueryParams);

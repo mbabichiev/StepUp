@@ -203,6 +203,7 @@ response:
 - **unsubscribe from user**
 - **get user by login**
 - **get user photo by login**
+- **get all users by query params**
 - **get subscribers of user**
 - **get followings of user**
 - **get own user events by login**
@@ -276,6 +277,32 @@ response: photo
 ```
 `Errors:`
 - `No errors`
+
+#
+
+`GET - /api/users` - get all users by query params
+
+`Query params`:
+- `limit` (default `30`);
+- `sort`: `old`, `new` (default `new`);
+- `page` (default `0`). 
+
+```JavaScript
+response: 
+[
+    {
+        "id": "id",
+        "login": "login",
+        "firstname": "Firstname",
+        "lastname": "Lastname",
+        "email": "example@gmail.com",
+        "role": "user / admin",
+        "official": true / false,
+        "description": "some description"
+    },
+    ...
+]
+```
 
 #
 
